@@ -23,19 +23,26 @@ def stdenv_stage(stdenv)
   end
 end
 
-def print_drv_by_stdenv(deps)
-  result = deps
+def drv_by_stdenv(deps)
+  deps
     .group_by { |drv, indrvs| find_stdenv(indrvs) }
     .transform_values { |drvlist| drvlist.map(&:first).map { |drv| drop_hash(drv) }.sort }
     .sort_by { |stdenv, v| [(stdenv_stage(stdenv) if stdenv) || "", v.length] }
     .map { |stdenv, v| [(drop_hash(stdenv) if stdenv), v] }
-  puts(result.to_json)
 end
 
 
 def main
   deps = JSON.parse(STDIN.read)
-  print_drv_by_stdenv(deps)
+  report = drv_by_stdenv(deps)
+
+  report.each do |stdenv, drvs|
+    puts "# #{stdenv || "no stdenv"}"
+    drvs.each do |drv|
+      puts " - #{drv}"
+    end
+    puts
+  end
 end
 
 main
