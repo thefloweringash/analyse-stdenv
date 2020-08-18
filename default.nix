@@ -3,30 +3,20 @@
 let
   inherit (pkgs) callPackage substituteAll lib;
 
+  inherit (import ./nix/ruby.nix { inherit pkgs; })
+    ruby rubyEnv;
+
   nix-build-deps = pkgs.callPackage ./nix-build-deps {};
 
-  drv-by-stdenv = pkgs.runCommand "drv-by-stdenv" {
-    buildInputs = [ pkgs.ruby ];
-  } ''
-    mkdir -p $out/bin
-    cp ${./drv-by-stdenv.rb} $out/bin/$name
-    chmod a+x $out/bin/$name
-    patchShebangs $out/bin
+  drv-by-stdenv = pkgs.writeScriptBin "drv-by-stdenv" ''
+    exec ${rubyEnv.wrappedRuby}/bin/ruby ${./drv-by-stdenv.rb} "$@"
   '';
 
-  analyse-darwin-stdenv = pkgs.runCommand "analyse-darwin-stdenv" {
-    nativeBuildInputs = [ pkgs.makeWrapper ];
-  } ''
-    set -x
-    mkdir -p $out/bin
-    cp ${./analyse-darwin-stdenv.sh} $out/bin/$name
-    chmod a+x $out/bin/$name
-    patchShebangs $out/bin
-
-    wrapProgram $out/bin/$name --prefix PATH : ${lib.makeBinPath [
-      nix-build-deps drv-by-stdenv
-    ]}
+  analyse-stdenv = pkgs.writeScriptBin "analyse-stdenv" ''
+    export PATH=${lib.makeBinPath [ nix-build-deps drv-by-stdenv ]}:$PATH
+    hello=$(nix-instantiate -A hello)
+    nix-build-deps $hello | drv-by-stdenv $hello
   '';
 
 in
-  analyse-darwin-stdenv
+  analyse-stdenv

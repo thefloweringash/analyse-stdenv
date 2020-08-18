@@ -1,7 +1,5 @@
-# stdenv-darwin.drv
- - hello-2.10.drv
-
-# no stdenv
+# Derivation by stdenv
+## no stdenv
  - bootstrap-stage0-stdenv-darwin.drv
  - bootstrap-stage0-stdenv-darwin.drv
  - bootstrap-stage1-stdenv-darwin.drv
@@ -15,16 +13,16 @@
  - bootstrap-tools.drv
  - stdenv-darwin.drv
 
-# bootstrap-stage0-stdenv-darwin.drv
+## bootstrap-stage0-stdenv-darwin.drv
  - bootstrap-stage1-binutils-wrapper-.drv
  - bootstrap-stage1-clang-wrapper-.drv
 
-# bootstrap-stage0-stdenv-darwin.drv
+## bootstrap-stage0-stdenv-darwin.drv
  - bootstrap-stage0-Libsystem.drv
  - bootstrap-stage0-libcxx.drv
  - bootstrap-stage0-libcxxabi.drv
 
-# bootstrap-stage1-stdenv-darwin.drv
+## bootstrap-stage1-stdenv-darwin.drv
  - binutils-wrapper-2.31.1.drv
  - bootstrap-stage2-binutils-wrapper-.drv
  - bootstrap-stage2-clang-wrapper-.drv
@@ -39,7 +37,7 @@
  - ps-1003.1-2008.drv
  - python-setup-hook.sh.drv
 
-# bootstrap-stage1-stdenv-darwin.drv
+## bootstrap-stage1-stdenv-darwin.drv
  - CarbonHeaders-osx-10.6.2.drv
  - CommonCrypto-osx-10.12.6.drv
  - Csu-osx-10.11.6.drv
@@ -76,7 +74,7 @@
  - expand-response-params.drv
  - expat-2.2.8.drv
  - flex-2.6.4.drv
- - gettext-0.20.1.drv
+ - gettext-0.21.drv
  - gmp-6.2.0.drv
  - gnugrep-3.4.drv
  - gnum4-1.4.18.drv
@@ -95,7 +93,6 @@
  - libpthread-osx-10.12.6.drv
  - libresolv-osx-10.12.6.drv
  - libssh2-1.9.0.drv
- - libtapi-1000.10.8.drv
  - libtool-2.4.6.drv
  - libutil-osx-10.12.6.drv
  - libxml2-2.9.10.drv
@@ -121,7 +118,7 @@
  - xz-5.2.5.drv
  - zlib-1.2.11.drv
 
-# bootstrap-stage2-stdenv-darwin.drv
+## bootstrap-stage2-stdenv-darwin.drv
  - binutils-wrapper-2.31.1.drv
  - bootstrap-stage3-binutils-wrapper-.drv
  - bootstrap-stage3-clang-wrapper-.drv
@@ -129,7 +126,7 @@
  - hook.drv
  - hook.drv
 
-# bootstrap-stage2-stdenv-darwin.drv
+## bootstrap-stage2-stdenv-darwin.drv
  - adv_cmds-osx-10.5.8.drv
  - bash-4.4-p23.drv
  - binutils-2.31.1.drv
@@ -141,7 +138,7 @@
  - libiconv-osx-10.12.6.drv
  - pcre-8.44.drv
 
-# bootstrap-stage3-stdenv-darwin.drv
+## bootstrap-stage3-stdenv-darwin.drv
  - bootstrap-stage4-binutils-wrapper-.drv
  - bootstrap-stage4-clang-wrapper-.drv
  - hook.drv
@@ -149,7 +146,7 @@
  - hook.drv
  - setup-hook.drv
 
-# bootstrap-stage3-stdenv-darwin.drv
+## bootstrap-stage3-stdenv-darwin.drv
  - ICU-osx-10.10.5.drv
  - bzip2-1.0.6.0.1.drv
  - clang-7.1.0.drv
@@ -179,84 +176,42 @@
  - xz-5.2.5.drv
  - zlib-1.2.11.drv
 
-# bootstrap-stage4-stdenv-darwin.drv
+## bootstrap-stage4-stdenv-darwin.drv
  - cctools-binutils-darwin-wrapper-927.0.2.drv
  - clang-wrapper-7.1.0.drv
  - hook.drv
- - hook.drv
- - hook.drv
- - hook.drv
  - install-shell-files.drv
  - pkg-config-wrapper-0.29.2.drv
- - ps-1003.1-2008.drv
 
-# bootstrap-stage4-stdenv-darwin.drv
+## bootstrap-stage4-stdenv-darwin.drv
  - ICU-osx-10.10.5.drv
- - MacOS_SDK-10.12.drv
- - adv_cmds-osx-10.5.8.drv
- - apple-framework-Accelerate.drv
- - apple-framework-ApplicationServices.drv
- - apple-framework-CFNetwork.drv
- - apple-framework-CoreAudio.drv
- - apple-framework-CoreData.drv
- - apple-framework-CoreFoundation.drv
- - apple-framework-CoreGraphics.drv
- - apple-framework-CoreServices.drv
- - apple-framework-CoreText.drv
- - apple-framework-CoreWLAN.drv
- - apple-framework-DiskArbitration.drv
- - apple-framework-IOBluetooth.drv
- - apple-framework-IOKit.drv
- - apple-framework-IOSurface.drv
- - apple-framework-ImageIO.drv
- - apple-framework-NetFS.drv
- - apple-framework-OpenDirectory.drv
- - apple-framework-Security.drv
- - apple-framework-SecurityFoundation.drv
- - apple-framework-ServiceManagement.drv
- - apple-framework-SystemConfiguration.drv
- - apple-lib-xpc.drv
  - autoconf-2.69.drv
  - automake-1.16.2.drv
  - binutils-2.31.1.drv
  - bison-3.6.4.drv
  - bootstrap_cmds-dev-tools-7.0.drv
- - bsdmake-dev-tools-3.2.6.drv
  - c-ares-1.15.0.drv
  - cctools-binutils-darwin-927.0.2.drv
  - cctools-port.drv
- - cmake-3.18.0.drv
- - cmake-3.18.0.drv
- - cpio-2.13.drv
  - curl-7.71.1.drv
  - expand-response-params.drv
- - expat-2.2.8.drv
- - file-5.39.drv
  - flex-2.6.4.drv
- - gettext-0.20.1.drv
+ - gettext-0.21.drv
  - gnum4-1.4.18.drv
  - gnutar-1.32.drv
  - help2man-1.47.16.drv
- - libarchive-3.4.3.drv
- - libarchive-3.4.3.drv
  - libev-4.33.drv
  - libkrb5-1.18.drv
  - libssh2-1.9.0.drv
- - libtapi-1000.10.8.drv
  - libtool-2.4.6.drv
- - libuv-1.38.1.drv
- - lzo-2.10.drv
  - nghttp2-1.40.0.drv
  - objc4-osx-10.12.6.drv
  - openssl-1.1.1g.drv
- - pbzx-1.0.2.drv
  - perl-5.30.3.drv
  - perl5.30.3-gettext-1.07.drv
  - pkg-config-0.29.2.drv
- - rhash-1.3.9.drv
- - sharutils-4.15.2.drv
  - swift-corefoundation.drv
- - which-2.21.drv
- - xar-1.6.1.drv
- - zstd-1.4.5.drv
+
+## stdenv-darwin.drv
+ - hello-2.10.drv
 
