@@ -114,6 +114,17 @@ def main
     end
     puts
   end
+
+  rebuilds_by_name = parser.parsed.values.sort_by(&:name).each_with_object({}) do |drv, acc|
+    if (drv.stdenv && stage = stdenv_stage(drv.stdenv.name))
+      (acc[drv.name] ||= []) << stage
+    end
+  end
+
+  puts '# Rebuilds by package name'
+  rebuilds_by_name.each do |name, stages|
+    puts " - #{name} #{stages.sort.join(',')}"
+  end
 end
 
 main
