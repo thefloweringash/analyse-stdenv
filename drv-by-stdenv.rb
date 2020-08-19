@@ -17,6 +17,36 @@ Derivation = Value.new(
   def name
     drop_hash(path)
   end
+
+  def lifespan
+    min = stdenv_stage(stdenv.path) unless stdenv.nil?
+    max = min
+    references.each do |ref|
+      stdenv = ref.stdenv? ? ref : ref.stdenv
+
+      raise 'reference does not have a stdenv' if stdenv.nil?
+
+      stage = stdenv_stage(stdenv.path)
+
+      if min.nil? || stage < min
+        min = stage
+      end
+
+      if max.nil? || stage > max
+        max = stage
+      end
+    end
+
+    if max == FINAL_STAGE
+      (min..)
+    else
+      (min..max)
+    end
+  end
+
+  def stdenv?
+    !!path.match(/stdenv/)
+  end
 end
 
 def drop_hash(path)
@@ -113,6 +143,15 @@ def main
       puts " - #{drop_hash(drv.path)}"
     end
     puts
+  end
+
+  lifespans_by_drv = parser.parsed.values.each_with_object({}) do |drv, acc|
+    (acc[drv.name] ||= []) << drv.lifespan
+  end
+
+  puts '# Lifespan by derivation'
+  lifespans_by_drv.sort_by { |name, _lifespans| name }.each do |name, lifespans|
+    puts " - #{name}: #{lifespans.inspect}"
   end
 end
 
