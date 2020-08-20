@@ -8,13 +8,15 @@ let
 
   nix-build-deps = pkgs.callPackage ./nix-build-deps {};
 
+  rubySource = pkgs.lib.sourceFilesBySuffices ./. ["rb"];
+
   drv-by-stdenv = pkgs.writeScriptBin "drv-by-stdenv" ''
-    exec ${rubyEnv.wrappedRuby}/bin/ruby ${./drv-by-stdenv.rb} "$@"
+    exec ${rubyEnv.wrappedRuby}/bin/ruby ${rubySource}/drv-by-stdenv.rb "$@"
   '';
 
   analyse-stdenv = pkgs.writeScriptBin "analyse-stdenv" ''
     export PATH=${lib.makeBinPath [ nix-build-deps drv-by-stdenv ]}:$PATH
-    hello=$(nix-instantiate -A hello)
+    hello=$(nix-instantiate -A hello "$@")
     nix-build-deps $hello | drv-by-stdenv $hello
   '';
 

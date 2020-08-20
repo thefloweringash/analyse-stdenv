@@ -13,6 +13,7 @@ Derivation = Value.new(
   :stdenv,
   :inputs,
   :references,
+  :dominator_path,
 ) do
   def name
     drop_hash(path)
@@ -46,10 +47,10 @@ def drv_by_stdenv(deps)
 end
 
 class Parser
-  attr_reader :deps, :references, :parsed
+  attr_reader :data, :references, :parsed
 
-  def initialize(deps)
-    @deps = deps
+  def initialize(data)
+    @data = data
     @references = {}
     @parsed = {}
   end
@@ -57,7 +58,7 @@ class Parser
   def parse(path)
     return parsed[path] if parsed.has_key?(path)
 
-    inputs = deps[path]
+    inputs, dominator_path = data[path].values_at('inputs', 'dominator')
 
     stdenv = find_stdenv(inputs)
     stdenv = parse(stdenv) if stdenv
@@ -68,6 +69,7 @@ class Parser
         stdenv: stdenv,
         inputs: inputs.map { |x| parse(x) },
         references: get_references(path),
+        dominator_path: dominator_path,
       )
 
     inputs.each do |input|
@@ -95,13 +97,33 @@ class Parser
   end
 end
 
+def print_dominator_tree(drvs_by_dominator, el, prefix="")
+  if (children = drvs_by_dominator[el.path])
+    children = children.sort_by(&:name)
+    children.each_with_index do |c, i|
+      last = i == children.length - 1
+      if last
+        self_prefix = prefix + "`--"
+        nested_prefix = prefix + "   "
+      else
+        self_prefix = prefix + "|--"
+        nested_prefix = prefix + "|  "
+      end
+
+      stdenv = c.stdenv&.path
+      puts "#{self_prefix} #{c.name}@#{stdenv_stage(stdenv) if stdenv}"
+      print_dominator_tree(drvs_by_dominator, c, nested_prefix)
+    end
+  end
+end
+
 def main
   root = ARGV[0]
-  deps = JSON.parse($stdin.read)
+  data = JSON.parse($stdin.read)
 
   raise 'missing root' if root.nil?
 
-  parser = Parser.new(deps)
+  parser = Parser.new(data)
   parser.parse(root)
 
   drvs_by_stdenv = drv_by_stdenv(parser.parsed)
@@ -110,13 +132,13 @@ def main
   drvs_by_stdenv.each do |stdenv, drvs|
     puts "## #{stdenv || 'no stdenv'}"
     drvs.each do |drv|
-      puts " - #{drop_hash(drv.path)}"
+      puts " - #{drv.name}"
     end
     puts
   end
 
   rebuilds_by_name = parser.parsed.values.sort_by(&:name).each_with_object({}) do |drv, acc|
-    if (drv.stdenv && stage = stdenv_stage(drv.stdenv.name))
+    if drv.stdenv && (stage = stdenv_stage(drv.stdenv.name))
       (acc[drv.name] ||= []) << stage
     end
   end
@@ -125,6 +147,21 @@ def main
   rebuilds_by_name.each do |name, stages|
     puts " - #{name} #{stages.sort.join(',')}"
   end
+  puts
+
+  drvs_by_dominator = parser.parsed.values.group_by(&:dominator_path)
+  puts '# Dominator tree'
+  puts '```'
+
+  if drvs_by_dominator[nil].length != 1
+    puts 'warning: no singleton root dominator'
+  end
+
+  drvs_by_dominator[nil].each do |drv|
+    puts drv.name
+    print_dominator_tree(drvs_by_dominator, drv)
+  end
+  puts '```'
 end
 
 main
