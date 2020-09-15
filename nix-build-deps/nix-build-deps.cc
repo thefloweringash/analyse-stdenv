@@ -80,15 +80,13 @@ public:
 
         for (const auto &in : drv.inputDrvs) {
             const auto &indrv = store->derivationFromPath(in.first);
-            if (indrv.isFixedOutput()) {
-              continue;
-            }
 
             deps.emplace_back(in.first);
             findDepsRecursive(in.first, std::optional<dependency_graph::vertex_descriptor>{self});
         }
 
         result[path] = json{
+          {"fixed_output", drv.isFixedOutput()},
           {"inputs", deps}
         };
     }

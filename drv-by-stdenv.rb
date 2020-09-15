@@ -14,9 +14,14 @@ Derivation = Value.new(
   :inputs,
   :references,
   :dominator_path,
+  :fixed_output,
 ) do
   def name
     drop_hash(path)
+  end
+
+  def fixed_output?
+    self.fixed_output
   end
 end
 
@@ -58,7 +63,8 @@ class Parser
   def parse(path)
     return parsed[path] if parsed.has_key?(path)
 
-    inputs, dominator_path = data[path].values_at('inputs', 'dominator')
+    dominator_path = data[path]['dominator']
+    inputs, fixed_output = data[path].fetch_values('inputs', 'fixed_output')
 
     stdenv = find_stdenv(inputs)
     stdenv = parse(stdenv) if stdenv
@@ -70,6 +76,7 @@ class Parser
         inputs: inputs.map { |x| parse(x) },
         references: get_references(path),
         dominator_path: dominator_path,
+        fixed_output: fixed_output,
       )
 
     inputs.each do |input|
@@ -99,7 +106,7 @@ end
 
 def print_dominator_tree(drvs_by_dominator, el, prefix="")
   if (children = drvs_by_dominator[el.path])
-    children = children.sort_by(&:name)
+    children = children.sort_by(&:name).reject(&:fixed_output?)
     children.each_with_index do |c, i|
       last = i == children.length - 1
       if last
@@ -131,7 +138,7 @@ def main
   puts '# Derivation by stdenv'
   drvs_by_stdenv.each do |stdenv, drvs|
     puts "## #{stdenv || 'no stdenv'}"
-    drvs.each do |drv|
+    drvs.reject(&:fixed_output?).each do |drv|
       extra = []
 
       if stdenv
@@ -161,6 +168,8 @@ def main
   end
 
   rebuilds_by_name = parser.parsed.values.sort_by(&:name).each_with_object({}) do |drv, acc|
+    next if drv.fixed_output?
+
     if drv.stdenv && (stage = stdenv_stage(drv.stdenv.name))
       (acc[drv.name] ||= []) << stage
     end
