@@ -132,7 +132,30 @@ def main
   drvs_by_stdenv.each do |stdenv, drvs|
     puts "## #{stdenv || 'no stdenv'}"
     drvs.each do |drv|
-      puts " - #{drv.name}"
+      extra = []
+
+      if stdenv
+        this_stage = stdenv_stage(stdenv)
+
+        internal_usages = drv.references.count { |x| x.stdenv && stdenv_stage(x.stdenv.name) == this_stage }
+        extra << "i=#{internal_usages}"
+
+        external_usages = drv.references.count { |x| x.stdenv && stdenv_stage(x.stdenv.name) != this_stage }
+        extra << "e=#{external_usages}"
+
+        stdenv_usages = drv.references.map { |x| stdenv_stage(x.name) rescue nil }.compact.sort.uniq
+        unless stdenv_usages.empty?
+          extra << "s=[#{stdenv_usages.join(",")}]"
+        end
+      end
+
+      # extra << "path=#{drv.path}"
+
+      if extra.empty?
+        puts " - #{drv.name}"
+      else
+        puts " - #{drv.name} (#{extra.join(", ")})"
+      end
     end
     puts
   end
